@@ -240,10 +240,10 @@ public class UserServiceImpl implements UserService {
     }
 
     private OrganizationType convertToOrganizationTypeEnum(String type) throws Exception {
-        if(type.toLowerCase() == "police") return OrganizationType.POLICE;
-        if(type.toLowerCase() == "fire") return OrganizationType.FIRE;
-        if(type.toLowerCase() == "ambulance") return OrganizationType.AMBULANCE;
-        if(type.toLowerCase() == "vet") return OrganizationType.VET;
+        if(type.equalsIgnoreCase("police")) return OrganizationType.POLICE;
+        if(type.equalsIgnoreCase("fire")) return OrganizationType.FIRE;
+        if(type.equalsIgnoreCase("ambulance")) return OrganizationType.AMBULANCE;
+        if(type.equalsIgnoreCase("vet")) return OrganizationType.VET;
         throw new Exception("Organization Type Not Found");
     }
 }

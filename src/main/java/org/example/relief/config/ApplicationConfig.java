@@ -1,6 +1,7 @@
 package org.example.relief.config;
 
 import org.example.relief.repository.UserRepository;
+import org.example.relief.service.impl.CustomUserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,8 +16,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public class ApplicationConfig {
 
     private final UserRepository userRepository;
-    public ApplicationConfig(UserRepository userRepository) {
+    private final CustomUserDetailsServiceImpl customUserDetailsService;
+
+    public ApplicationConfig(UserRepository userRepository, CustomUserDetailsServiceImpl customUserDetailsService) {
         this.userRepository = userRepository;
+        this.customUserDetailsService = customUserDetailsService;
     }
 
     @Bean
@@ -39,7 +43,7 @@ public class ApplicationConfig {
     AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 
-        authProvider.setUserDetailsService(userDetailsService());
+        authProvider.setUserDetailsService(customUserDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
 
         return authProvider;
