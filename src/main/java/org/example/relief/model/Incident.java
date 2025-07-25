@@ -11,6 +11,7 @@ import org.geolatte.geom.Point;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Data
 @AllArgsConstructor
@@ -35,6 +36,6 @@ public class Incident {
     @OneToMany(mappedBy = "incident")
     private List<Image> images;
 
-    @ManyToOne()
+    @ManyToOne(optional = true)
     private User uploader;
 }
