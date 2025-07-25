@@ -1,4 +1,4 @@
-package org.example.relief.Response;
+package org.example.relief.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

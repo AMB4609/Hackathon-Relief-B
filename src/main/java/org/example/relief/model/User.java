@@ -1,14 +1,13 @@
-    package org.example.relief.Model;
+    package org.example.relief.model;
 
     import jakarta.persistence.*;
     import lombok.AllArgsConstructor;
     import lombok.Builder;
     import lombok.Data;
     import lombok.NoArgsConstructor;
-    import org.example.relief.Enums.OrganizationType;
+    import org.example.relief.enums.OrganizationType;
     import org.springframework.data.geo.Point;
 
-    import javax.annotation.Nullable;
     import java.time.LocalDateTime;
     import java.util.List;
 
@@ -16,6 +15,8 @@
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
+    @Entity
+    @Table(name = "users")
     public class User {
 
         //Common fields

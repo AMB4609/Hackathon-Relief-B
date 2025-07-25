@@ -1,6 +1,6 @@
-package org.example.relief.Exception;
+package org.example.relief.exception;
 
-import org.example.relief.Response.ApiResponse;
+import org.example.relief.response.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

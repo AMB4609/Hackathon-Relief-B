@@ -1,4 +1,4 @@
-package org.example.relief.Controller;
+package org.example.relief.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 

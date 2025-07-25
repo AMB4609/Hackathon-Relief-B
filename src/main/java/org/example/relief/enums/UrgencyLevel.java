@@ -1,4 +1,4 @@
-package org.example.relief.Enums;
+package org.example.relief.enums;
 
 public enum UrgencyLevel {
     HIGH,
