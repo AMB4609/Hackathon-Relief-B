@@ -10,13 +10,15 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class ApiResponse<T> {
+    private Integer  code;
     private LocalDateTime timestamp;
     private boolean success;
     private String message;
     private T data;
 
-    public static <T> ApiResponse<T> success(String message, T data) {
+    public static <T> ApiResponse<T> success(int code,String message, T data) {
         return ApiResponse.<T>builder()
+                .code(code)
                 .timestamp(LocalDateTime.now())
                 .success(true)
                 .message(message)
@@ -24,8 +26,9 @@ public class ApiResponse<T> {
                 .build();
     }
 
-    public static <T> ApiResponse<T> error(String message, T data) {
+    public static <T> ApiResponse<T> error(int code, String message, T data) {
         return ApiResponse.<T>builder()
+                .code(code)
                 .timestamp(LocalDateTime.now())
                 .success(false)
                 .message(message)
