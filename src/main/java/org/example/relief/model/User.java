@@ -7,8 +7,12 @@
     import lombok.NoArgsConstructor;
     import org.example.relief.enums.OrganizationType;
     import org.springframework.data.geo.Point;
+    import org.springframework.security.core.GrantedAuthority;
+    import org.springframework.security.core.authority.SimpleGrantedAuthority;
+    import org.springframework.security.core.userdetails.UserDetails;
 
     import java.time.LocalDateTime;
+    import java.util.Collection;
     import java.util.List;
 
     @Data
@@ -17,12 +21,14 @@
     @Builder
     @Entity
     @Table(name = "users")
-    public class User {
+    public class User implements UserDetails {
 
         //Common fields
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long userId;
+        @Column(nullable = false)
+        private String username;
         @Column(nullable = false)
         private String email;
         @Column(nullable = false)
@@ -57,4 +63,11 @@
 
         @OneToMany(mappedBy = "uploader")
         private List<Incident> uploadedIncidents;
+
+        @Override
+        public Collection<? extends GrantedAuthority> getAuthorities() {
+            return roles.stream()
+                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
+                    .toList();
+        }
     }
