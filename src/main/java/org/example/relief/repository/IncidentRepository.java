@@ -16,6 +16,20 @@ import java.util.List;
 @Repository
 public interface IncidentRepository extends JpaRepository<Incident, Long>, JpaSpecificationExecutor<Incident> {
 
-    @Query("SELECT i FROM Incident i WHERE ST_DWithin(i.location, :point, :distance)")
-    List<Incident> findIncidentsWithinDistance(@Param("point") Point point, @Param("distance") Double distance);
+//    @Query("SELECT i FROM Incident i WHERE ST_DWithin(i.location, :point, :distance)")
+    @Query(value = "SELECT * FROM incident WHERE ST_DWithin(location, :point, :distance)",
+            nativeQuery = true)
+    List<Incident> findIncidentsWithinDistance(@Param("point") Point point,
+                                               @Param("distance") Double distance);
+
+
+    @Query(value = """
+        SELECT ST_DWithin(location, :userPoint, :dist)
+        FROM incidents
+        WHERE incident_id = :incidentId
+        """,
+            nativeQuery = true)
+    boolean isWithinDistance(@Param("incidentId") Long incidentId,
+                             @Param("userPoint") Point userPoint,
+                             @Param("dist")      double distanceInM);
 }

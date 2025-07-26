@@ -13,7 +13,8 @@ import java.util.List;
 public class IncidentResponse {
     private Long incidentId;
     private String title;
-    private Point location;
+    private double longitude;
+    private double latitude;
     private String urgencyLevel;
     private String description;
     private String organizationType;

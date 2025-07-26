@@ -6,6 +6,7 @@ import org.example.relief.model.Role;
 import org.example.relief.model.User;
 import org.example.relief.repository.ImageRepository;
 import org.example.relief.repository.UserRepository;
+import org.example.relief.request.LocationUpdateRequest;
 import org.example.relief.request.LoginRequest;
 import org.example.relief.request.OrganizationSignupRequest;
 import org.example.relief.request.UserSignupRequest;
@@ -16,6 +17,9 @@ import org.example.relief.response.UserSignupResponse;
 import org.example.relief.service.CloudinaryService;
 import org.example.relief.service.RoleService;
 import org.example.relief.service.UserService;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,6 +27,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -113,12 +118,11 @@ public class UserServiceImpl implements UserService {
             throw new Exception("Role not found.");
         }
 
-        //Todo : cloudinary
         if (image == null || image.isEmpty()){
             throw new Exception("Didn't receive organization image.");
         }
         //upload to cloudinary
-        Map uploadResult = cloudinaryService.uploadImage(image, "user_profiles");
+        Map uploadResult = cloudinaryService.uploadImage(image, "organizations");
 
         //Saving organization to db
         User savedOrganization = userRepository.save(User.builder()
@@ -193,6 +197,19 @@ public class UserServiceImpl implements UserService {
                 .role(roleName)
                 .build();
     }
+
+    public void updateUserLocation(long userId, double longitude, double latitude){
+        Point location = new GeometryFactory()
+                .createPoint(new Coordinate(longitude, latitude));
+        location.setSRID(4326);
+
+        userRepository.updateUserLocation(userId, location, LocalDateTime.now());
+    }
+
+    public void updateUserLocation(long userId, Point location){
+        userRepository.updateUserLocation(userId, location, LocalDateTime.now());
+    }
+
 
     private void credentialsCheck(
             String password, String confirmPassword,
