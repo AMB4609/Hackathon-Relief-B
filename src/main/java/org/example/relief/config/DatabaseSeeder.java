@@ -44,7 +44,7 @@ public class DatabaseSeeder implements CommandLineRunner {
     private void seedRoles() {
         // Check if roles already exist
         if (roleRepository.count() == 0) {
-            List<String> roleNames = Arrays.asList("USER", "ADMIN", "STAFF");
+            List<String> roleNames = Arrays.asList("USER", "ADMIN", "ORGANIZATION");
 
             for (String roleName : roleNames) {
                 Role role = Role.builder()
@@ -120,16 +120,8 @@ public class DatabaseSeeder implements CommandLineRunner {
             List<Role> roles = new ArrayList<>();
             roles.add(role);
 
-            Image image = Image.builder()
-                    .imageId(1)
-                    .imageType("png")
-                    .imagePath("https://res.cloudinary.com/deytqgusq/image/upload/v1753457793/user_profiles/tbwdl9uanh9pit5lratd.png")
-                    .imagePublicId("user_profiles/tbwdl9uanh9pit5lratd")
-                    .build();
-            imageRepository.save(image);
-
             // Create user user
-            User user = User.builder()
+            User organization = User.builder()
                     .username("org1")
                     .email("org1@example.com")
                     .password(passwordEncoder.encode("org1@123"))
@@ -138,10 +130,18 @@ public class DatabaseSeeder implements CommandLineRunner {
                     .name("Org One")
                     .organizationType(OrganizationType.POLICE)
                     .roles(roles)
-                    .organizationImage(image)
                     .build();
+            userRepository.save(organization);
 
-            userRepository.save(user);
+            Image image = imageRepository.save(Image.builder()
+                    .imageType("png")
+                    .imagePath("https://res.cloudinary.com/deytqgusq/image/upload/v1753457793/user_profiles/tbwdl9uanh9pit5lratd.png")
+                    .imagePublicId("user_profiles/tbwdl9uanh9pit5lratd")
+                    .organization(organization)
+                    .build());;
+
+            organization.setOrganizationImage(image);
+            userRepository.save(organization); //saving again after establishing relationship
 
             System.out.println("Organization user and image has been seeded successfully");
         } else {
@@ -156,8 +156,7 @@ public class DatabaseSeeder implements CommandLineRunner {
                     .createPoint(new Coordinate(85.324, 27.7172));
             location.setSRID(4326);
 
-            Incident incident = Incident.builder()
-                    .incidentId(1L)
+            Incident incident = incidentRepository.save(Incident.builder()
                     .title("Huge Floods in Lalitpur")
                     .description("Two houses have been swept with the flood. The people are stranded.")
                     .incidentDate(LocalDateTime.now())
@@ -166,27 +165,25 @@ public class DatabaseSeeder implements CommandLineRunner {
                     .urgencyLevel(UrgencyLevel.HIGH)
                     .organizationType(OrganizationType.POLICE)
                     .uploader(User.builder().userId(2L).build())
-                    .build();
-            incidentRepository.save(incident);
+                    .build());
 
             List<Image> images = new ArrayList<>();
-            Image image1 = Image.builder()
-                    .imageId(2)
+            Image image1 = imageRepository.save(Image.builder()
                     .imageType("jpg")
                     .imagePath("https://res.cloudinary.com/deytqgusq/image/upload/v1753517062/incidents/smk35mfftdw2vxy3bfec.jpg")
                     .imagePublicId("incidents/smk35mfftdw2vxy3bfec")
                     .incident(incident)
-                    .build();
-            Image image2 = Image.builder()
-                    .imageId(3)
+                    .build());
+
+            Image image2 = imageRepository.save(Image.builder()
                     .imageType("jpg")
                     .imagePath("https://res.cloudinary.com/deytqgusq/image/upload/v1753517063/incidents/s9jbnsois6oufcvdjnhq.jpg")
                     .imagePublicId("incidents/s9jbnsois6oufcvdjnhq")
                     .incident(incident)
-                    .build();
+                    .build());
+
             images.add(image1);
             images.add(image2);
-            imageRepository.saveAll(images);
 
             incident.setImages(images);
             incidentRepository.save(incident);
