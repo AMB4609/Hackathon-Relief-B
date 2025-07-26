@@ -82,6 +82,7 @@ public class UserServiceImpl implements UserService {
                 .contact(userSignupRequest.getContact())
                 .password(passwordEncoder.encode(userSignupRequest.getPassword()))
                 .address(userSignupRequest.getAddress())
+                .canPost(true)
                 .roles(userRoles)
                 .build());
 
@@ -130,6 +131,7 @@ public class UserServiceImpl implements UserService {
                 .contact(organizationSignupRequest.getContact())
                 .password(passwordEncoder.encode(organizationSignupRequest.getPassword()))
                 .address(organizationSignupRequest.getAddress())
+                .canPost(true)
                 .organizationType(convertToOrganizationTypeEnum(organizationSignupRequest.getOrganizationType()))
                 .build());
 

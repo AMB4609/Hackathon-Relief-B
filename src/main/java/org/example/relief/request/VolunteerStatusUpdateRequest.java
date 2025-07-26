@@ -14,5 +14,4 @@
         private double longitude;
         private double latitude;
         private Long userId; // Link to User
-        private Long incidentId; // Link to Incident
     }
