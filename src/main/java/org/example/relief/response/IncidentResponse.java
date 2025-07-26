@@ -20,6 +20,7 @@ public class IncidentResponse {
     private String organizationType;
     private LocalDateTime incidentDate;
     private LocalDateTime listedDate;
+    private int flagCount;
     private List<ImageResponse> images;
     private UserNameResponse uploader;
 }

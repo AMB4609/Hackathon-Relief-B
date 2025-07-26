@@ -13,6 +13,7 @@ import org.example.relief.response.ApiResponse;
 import org.example.relief.response.IncidentResponse;
 import org.example.relief.service.IncidentService;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,6 +38,17 @@ public class IncidentController {
 
         IncidentResponse savedIncident = incidentService.reportIncident(incident, images);
         return ApiResponse.success(200,"incident successfully reported", savedIncident);
+    }
+
+    @PostMapping("/{incidentId}/flag")
+    public ResponseEntity<?> flagIncident(@PathVariable Long incidentId,
+                                          @RequestParam Long userId) {
+        try {
+            incidentService.flagIncident(userId, incidentId);
+            return ResponseEntity.ok("Flagged successfully");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
 

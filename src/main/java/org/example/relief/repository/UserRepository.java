@@ -1,6 +1,5 @@
 package org.example.relief.repository;
 
-import org.example.relief.model.Incident;
 import org.example.relief.model.User;
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.jpa.repository.JpaRepository;

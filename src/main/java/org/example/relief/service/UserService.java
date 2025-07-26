@@ -28,4 +28,6 @@ public interface UserService {
     void updateUserLocation(long userId, double longitude, double latitude);
 
     void updateUserLocation(long userId, Point location);
+
+    void disableUserPosting(Long userId) throws Exception;
 }

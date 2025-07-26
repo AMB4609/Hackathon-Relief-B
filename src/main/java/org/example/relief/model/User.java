@@ -41,6 +41,7 @@ public class User implements UserDetails {
     //Person Specific
     private String firstName;
     private String lastName;
+    private boolean canPost = true;
 
     //Organization Specific
     private String name;

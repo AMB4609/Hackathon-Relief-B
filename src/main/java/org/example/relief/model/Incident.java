@@ -38,4 +38,8 @@ public class Incident {
 
     @ManyToOne(optional = true)
     private User uploader;
+
+    @OneToMany(mappedBy = "incident", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Flag> flags;
+
 }

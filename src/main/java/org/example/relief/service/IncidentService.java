@@ -17,6 +17,8 @@ public interface IncidentService {
 
 //    void sendToSingleToken(String fcmToken, Incident incident);
 
+    void flagIncident(Long userId, Long incidentId) throws Exception;
+
     void updateUserLocationAfterIncident(LocationUpdateRequest request) throws Exception;
 
     IncidentResponse getIncidentDetails(Long incidentId) throws Exception;

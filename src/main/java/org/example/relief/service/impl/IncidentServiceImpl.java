@@ -7,9 +7,11 @@ import com.google.firebase.messaging.Notification;
 import lombok.RequiredArgsConstructor;
 import org.example.relief.enums.OrganizationType;
 import org.example.relief.enums.UrgencyLevel;
+import org.example.relief.model.Flag;
 import org.example.relief.model.Image;
 import org.example.relief.model.Incident;
 import org.example.relief.model.User;
+import org.example.relief.repository.FlagRepository;
 import org.example.relief.repository.ImageRepository;
 import org.example.relief.repository.IncidentRepository;
 import org.example.relief.repository.UserRepository;
@@ -49,6 +51,7 @@ public class IncidentServiceImpl implements IncidentService {
     private final Executor asyncExecutor;
     private final ImageRepository imageRepository;
     private final CloudinaryService cloudinaryService;
+    private final FlagRepository flagRepository;
 
     @Override
     public IncidentResponse reportIncident(IncidentRequest req, List<MultipartFile> images) throws Exception {
@@ -139,6 +142,26 @@ public class IncidentServiceImpl implements IncidentService {
 //    }
 
     @Override
+    public void flagIncident(Long userId, Long incidentId) throws Exception {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new Exception("User not found"));
+
+        Incident incident = incidentRepository.findById(incidentId)
+                .orElseThrow(() -> new Exception("Incident not found"));
+
+        if (flagRepository.existsByUserAndIncident(user, incident)) {
+            throw new Exception("You have already flagged this incident.");
+        }
+
+        Flag flag = Flag.builder()
+                .user(user)
+                .incident(incident)
+                .build();
+
+        flagRepository.save(flag);
+    }
+
+    @Override
     public void updateUserLocationAfterIncident(LocationUpdateRequest request) throws Exception {
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(()-> new Exception("User with given id not found."));
@@ -163,6 +186,11 @@ public class IncidentServiceImpl implements IncidentService {
                                   List<MultipartFile> images) throws Exception {
         User uploader = userRepository.findById(req.getUploaderId())
                 .orElseThrow(()-> new Exception("User with given id not found."));
+
+        if (!uploader.isCanPost()) {
+            throw new Exception("You are not allowed to post incidents.");
+        }
+
         Point location = new GeometryFactory()
                 .createPoint(new Coordinate(req.getLongitude(), req.getLatitude()));
         location.setSRID(4326);
@@ -275,6 +303,7 @@ public class IncidentServiceImpl implements IncidentService {
                 .organizationType(incident.getOrganizationType() != null ? incident.getOrganizationType().name() : null)
                 .incidentDate(incident.getIncidentDate())
                 .listedDate(incident.getListedDate())
+                .flagCount(flagRepository.countByIncident(incident))
                 .images(imageResponses)
                 .uploader(uploaderResponse)
                 .build();

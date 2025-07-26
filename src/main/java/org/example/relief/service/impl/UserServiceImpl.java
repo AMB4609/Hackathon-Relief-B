@@ -259,6 +259,19 @@ public class UserServiceImpl implements UserService {
         userRepository.updateUserLocation(userId, location, LocalDateTime.now());
     }
 
+    @Override
+    public void disableUserPosting(Long userId) throws Exception {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new Exception("User not found"));
+
+        if (!user.isCanPost()) {
+            throw new Exception("User is already disabled from posting.");
+        }
+
+        user.setCanPost(false);
+        userRepository.save(user);
+    }
+
 
     private void credentialsCheck(
             String password, String confirmPassword,

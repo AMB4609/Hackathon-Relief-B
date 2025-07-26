@@ -20,12 +20,10 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController {
     private final UserService userService;
     private final UserRepository userRepository;
-    private final UserServiceImpl userServiceImpl;
 
-    public UserController(UserService userService, UserRepository userRepository, UserServiceImpl userServiceImpl){
+    public UserController(UserService userService, UserRepository userRepository){
         this.userService = userService;
         this.userRepository = userRepository;
-        this.userServiceImpl = userServiceImpl;
     }
 
     @PostMapping("/signup/user")
@@ -75,7 +73,18 @@ public class UserController {
 
     @PutMapping("/updateVolunteerStatus")
     public void updateVolunteerStatus(@RequestBody VolunteerStatusUpdateRequest request) throws Exception {
-        userServiceImpl.updateVolunteerStatus(request);
+        userService.updateVolunteerStatus(request);
     }
+
+    @PutMapping("/{userId}/disablePosting")
+    public ResponseEntity<?> disableUserPosting(@PathVariable Long userId) {
+        try {
+            userService.disableUserPosting(userId);
+            return ResponseEntity.ok("User has been disabled from posting incidents.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 
 }
