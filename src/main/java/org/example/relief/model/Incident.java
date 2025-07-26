@@ -7,11 +7,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.relief.enums.OrganizationType;
 import org.example.relief.enums.UrgencyLevel;
-import org.geolatte.geom.Point;
+import org.locationtech.jts.geom.Point;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Data
 @AllArgsConstructor
@@ -24,6 +23,7 @@ public class Incident {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long incidentId;
     private String title;
+    @Column(columnDefinition = "geometry(Point, 4326)")
     private Point location;
     @Enumerated(EnumType.STRING)
     private UrgencyLevel urgencyLevel;

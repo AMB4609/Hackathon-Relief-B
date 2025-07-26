@@ -16,14 +16,14 @@ public class IncidentController {
     public final IncidentService incidentService;
 
     @PostMapping("create")
-    public ApiResponse createIncident(IncidentRequest incident) {
+    public ApiResponse createIncident(IncidentRequest incident) throws Exception {
         Incident savedIncident = incidentService.reportIncident(incident);
-        return ApiResponse.success(200,"incident sucessfully reported",savedIncident);
+        return ApiResponse.success(200,"incident successfully reported",savedIncident);
     }
     @PostMapping("/sendFcmToken")
     public ResponseEntity<Incident> testFcm(
             @RequestParam("token") String token,
-            @RequestBody IncidentRequest req) {
+            @RequestBody IncidentRequest req) throws Exception {
         Incident saved = incidentService.reportIncident(req);
         incidentService.sendToSingleToken(token, saved);
 

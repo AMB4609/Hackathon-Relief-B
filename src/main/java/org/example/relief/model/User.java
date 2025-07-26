@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.relief.enums.OrganizationType;
+import org.locationtech.jts.geom.Point;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,8 +14,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
-import org.geolatte.geom.G2D;
-import org.geolatte.geom.Point;
 
 @Data
 @AllArgsConstructor
@@ -52,7 +51,7 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private boolean isVolunteer = false;
     @Column(columnDefinition = "geometry(Point, 4326)")
-    private Point<G2D> availableLocation;
+    private Point availableLocation;
     private LocalDateTime locationUpdatedAt;
 
     //Relationship Attributes

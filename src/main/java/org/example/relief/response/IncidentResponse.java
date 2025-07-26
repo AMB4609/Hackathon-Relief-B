@@ -1,0 +1,24 @@
+package org.example.relief.response;
+
+import lombok.Builder;
+import lombok.Data;
+import org.locationtech.jts.geom.Point;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+
+@Data
+@Builder
+public class IncidentResponse {
+    private Long incidentId;
+    private String title;
+    private Point location;
+    private String urgencyLevel;
+    private String description;
+    private String organizationType;
+    private LocalDateTime incidentDate;
+    private LocalDateTime listedDate;
+    private List<ImageResponse> images;
+    private UserNameResponse uploader;
+}
