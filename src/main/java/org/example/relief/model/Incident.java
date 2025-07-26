@@ -39,6 +39,9 @@ public class Incident {
     @ManyToOne(optional = true)
     private User uploader;
 
+    @OneToOne(mappedBy = "incident", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Donation donation;
+
     @OneToMany(mappedBy = "incident", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Flag> flags;
 

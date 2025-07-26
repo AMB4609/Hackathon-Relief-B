@@ -32,14 +32,11 @@ public class DonationServiceImpl implements DonationService {
         Incident incident = incidentRepository.findById(request.getIncidentId())
                 .orElseThrow(() -> new IllegalArgumentException("Incident not found"));
 
-        Donation donation = Donation.builder()
+        Donation donation = donationRepository.save(Donation.builder()
                 .incident(incident)
-                .collectedAmount(request.getCollectedAmount())
+                .collectedAmount(0D)
                 .donationLimit(request.getDonationLimit())
-                .open(request.isOpen())
-                .build();
-
-        donationRepository.save(donation);
+                .build());
 
         return mapToResponse(donation);
     }
@@ -60,20 +57,18 @@ public class DonationServiceImpl implements DonationService {
             throw new IllegalStateException("Donation is closed.");
         }
 
-        double current = Double.parseDouble(donation.getCollectedAmount());
-        double incoming = request.getAmount();
-        double limit = Double.parseDouble(donation.getDonationLimit());
+        //the payment always succeeds as this is for demo
 
-        double updated = current + incoming;
-        donation.setCollectedAmount(String.valueOf(updated));
+        double updated = donation.getCollectedAmount() + request.getAmount();
+        donation.setCollectedAmount(updated);
         donation.setDonationCount(donation.getDonationCount() + 1);
 
-        if (updated >= limit) {
+        if (updated >= donation.getDonationLimit()) {
             donation.setOpen(false);
         }
 
         Transaction.TransactionBuilder txBuilder = Transaction.builder()
-                .amount(incoming)
+                .amount(request.getAmount())
                 .donatedAt(LocalDateTime.now())
                 .donation(donation)
                 .anonymous(request.isAnonymous());
@@ -82,14 +77,13 @@ public class DonationServiceImpl implements DonationService {
             userRepository.findById(request.getUserId()).ifPresent(txBuilder::user);
         }
 
-
         transactionRepository.save(txBuilder.build());
         donationRepository.save(donation);
     }
 
     private DonationResponse mapToResponse(Donation donation) {
         return DonationResponse.builder()
-                .id(donation.getId())
+                .id(donation.getDonationId())
                 .collectedAmount(donation.getCollectedAmount())
                 .donationLimit(donation.getDonationLimit())
                 .isOpen(donation.isOpen())

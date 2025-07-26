@@ -16,18 +16,17 @@ import lombok.NoArgsConstructor;
 public class Donation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long donationId;
 
-    @OneToOne
-    private Incident incident;
+    private Double collectedAmount;
 
-    private String collectedAmount;
+    private Double donationLimit;
 
-    private String donationLimit;
-
-    private boolean open;
+    private boolean isOpen = true;
 
     private Integer donationCount;
 
+    @OneToOne
+    private Incident incident;
 
 }

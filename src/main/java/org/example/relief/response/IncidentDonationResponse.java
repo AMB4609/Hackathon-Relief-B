@@ -5,11 +5,9 @@ import lombok.Data;
 
 @Data
 @Builder
-public class DonationResponse {
-    private Long id;
+public class IncidentDonationResponse {
+    private Long donationId;
     private Double donationLimit;
     private Double collectedAmount;
     private boolean isOpen;
-    private Long incidentId;
-    private String incidentTitle;
 }

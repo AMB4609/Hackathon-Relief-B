@@ -7,10 +7,7 @@ import com.google.firebase.messaging.Notification;
 import lombok.RequiredArgsConstructor;
 import org.example.relief.enums.OrganizationType;
 import org.example.relief.enums.UrgencyLevel;
-import org.example.relief.model.Flag;
-import org.example.relief.model.Image;
-import org.example.relief.model.Incident;
-import org.example.relief.model.User;
+import org.example.relief.model.*;
 import org.example.relief.repository.FlagRepository;
 import org.example.relief.repository.ImageRepository;
 import org.example.relief.repository.IncidentRepository;
@@ -19,6 +16,7 @@ import org.example.relief.request.IncidentFilterRequest;
 import org.example.relief.request.IncidentRequest;
 import org.example.relief.request.LocationUpdateRequest;
 import org.example.relief.response.ImageResponse;
+import org.example.relief.response.IncidentDonationResponse;
 import org.example.relief.response.IncidentResponse;
 import org.example.relief.response.UserNameResponse;
 import org.example.relief.service.CloudinaryService;
@@ -293,6 +291,17 @@ public class IncidentServiceImpl implements IncidentService {
 
         Point point = incident.getLocation();
 
+        IncidentDonationResponse donationResponse = null;
+        if (incident.getDonation() != null) {
+            Donation d = incident.getDonation();
+            donationResponse = IncidentDonationResponse.builder()
+                    .donationId(d.getDonationId())
+                    .collectedAmount(d.getCollectedAmount())
+                    .donationLimit(d.getDonationLimit())
+                    .isOpen(d.isOpen())
+                    .build();
+        }
+
         return IncidentResponse.builder()
                 .incidentId(incident.getIncidentId())
                 .title(incident.getTitle())
@@ -306,8 +315,10 @@ public class IncidentServiceImpl implements IncidentService {
                 .flagCount(flagRepository.countByIncident(incident))
                 .images(imageResponses)
                 .uploader(uploaderResponse)
+                .donation(donationResponse)
                 .build();
     }
+
 
 
     private OrganizationType convertToOrganizationTypeEnum(String type) throws Exception {

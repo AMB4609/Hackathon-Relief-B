@@ -7,5 +7,5 @@ public class DonationContributionRequest {
     private Long donationId;
     private Double amount;
     private Long userId;
-    private boolean anonymous;// Optional
+    private boolean anonymous;
 }

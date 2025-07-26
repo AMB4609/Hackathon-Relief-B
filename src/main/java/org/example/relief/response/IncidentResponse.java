@@ -23,4 +23,7 @@ public class IncidentResponse {
     private int flagCount;
     private List<ImageResponse> images;
     private UserNameResponse uploader;
+
+    //added now
+    private IncidentDonationResponse donation;
 }
