@@ -1,13 +1,14 @@
 package org.example.relief.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.relief.request.LoginRequest;
-import org.example.relief.request.OrganizationSignupRequest;
-import org.example.relief.request.UserSignupRequest;
+import org.example.relief.repository.UserRepository;
+import org.example.relief.request.*;
 import org.example.relief.response.LoginResponse;
 import org.example.relief.response.OrganizationSignupResponse;
+import org.example.relief.response.ProfilePageResponse;
 import org.example.relief.response.UserSignupResponse;
 import org.example.relief.service.UserService;
+import org.example.relief.service.impl.UserServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +19,13 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/user")
 public class UserController {
     private final UserService userService;
+    private final UserRepository userRepository;
+    private final UserServiceImpl userServiceImpl;
 
-    public UserController(UserService userService){
+    public UserController(UserService userService, UserRepository userRepository, UserServiceImpl userServiceImpl){
         this.userService = userService;
+        this.userRepository = userRepository;
+        this.userServiceImpl = userServiceImpl;
     }
 
     @PostMapping("/signup/user")
@@ -56,6 +61,21 @@ public class UserController {
         }catch (Exception e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("/profile/{userId}")
+    public ResponseEntity<?> profile(@PathVariable Long userId){
+        try{
+            ProfilePageResponse profile = userService.getProfilePage(userId);
+            return new ResponseEntity<>(profile, HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping("/updateVolunteerStatus")
+    public void updateVolunteerStatus(@RequestBody VolunteerStatusUpdateRequest request) throws Exception {
+        userServiceImpl.updateVolunteerStatus(request);
     }
 
 }

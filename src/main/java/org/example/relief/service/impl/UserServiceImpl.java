@@ -6,14 +6,11 @@ import org.example.relief.model.Role;
 import org.example.relief.model.User;
 import org.example.relief.repository.ImageRepository;
 import org.example.relief.repository.UserRepository;
-import org.example.relief.request.LocationUpdateRequest;
 import org.example.relief.request.LoginRequest;
 import org.example.relief.request.OrganizationSignupRequest;
 import org.example.relief.request.UserSignupRequest;
-import org.example.relief.response.ImageResponse;
-import org.example.relief.response.LoginResponse;
-import org.example.relief.response.OrganizationSignupResponse;
-import org.example.relief.response.UserSignupResponse;
+import org.example.relief.request.VolunteerStatusUpdateRequest;
+import org.example.relief.response.*;
 import org.example.relief.service.CloudinaryService;
 import org.example.relief.service.RoleService;
 import org.example.relief.service.UserService;
@@ -198,6 +195,57 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
+    @Override
+    public ProfilePageResponse getProfilePage(Long userId) throws Exception {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new Exception("User with given id not found."));
+
+        boolean isOrganization = user.getRoles().stream()
+                .anyMatch(role -> "ORGANIZATION".equalsIgnoreCase(role.getName()));
+
+        String fullName;
+        ImageResponse orgImageResponse = null;
+
+        if (isOrganization) {
+            fullName = user.getName();
+
+            if (user.getOrganizationImage() != null) {
+                Image img = user.getOrganizationImage();
+                orgImageResponse = ImageResponse.builder()
+                        .imagePath(img.getImagePath())
+                        .imageType(img.getImageType())
+                        .build();
+            }
+        } else {
+            String first = user.getFirstName() == null ? "" : user.getFirstName();
+            String last  = user.getLastName()  == null ? "" : user.getLastName();
+            fullName = (first + " " + last).trim();
+        }
+
+        return ProfilePageResponse.builder()
+                .userId(String.valueOf(user.getUserId()))
+                .username(user.getUsername())
+                .fullName(fullName)
+                .email(user.getEmail())
+                .contact(user.getContact())
+                .address(user.getAddress())
+                .isVolunteer(user.isVolunteer())
+                .organizationImage(orgImageResponse)     // null for personal users
+                .build();
+    }
+
+    @Override
+    public void updateVolunteerStatus(VolunteerStatusUpdateRequest request) throws Exception {
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new Exception("User with given id not found."));
+
+        user.setVolunteer(request.isStatus());
+        userRepository.save(user);
+
+        updateUserLocation(request.getUserId(), request.getLongitude(), request.getLatitude());
+    }
+
+    @Override
     public void updateUserLocation(long userId, double longitude, double latitude){
         Point location = new GeometryFactory()
                 .createPoint(new Coordinate(longitude, latitude));
@@ -206,6 +254,7 @@ public class UserServiceImpl implements UserService {
         userRepository.updateUserLocation(userId, location, LocalDateTime.now());
     }
 
+    @Override
     public void updateUserLocation(long userId, Point location){
         userRepository.updateUserLocation(userId, location, LocalDateTime.now());
     }
