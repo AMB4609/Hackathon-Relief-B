@@ -21,6 +21,7 @@ import org.example.relief.response.IncidentResponse;
 import org.example.relief.response.UserNameResponse;
 import org.example.relief.service.CloudinaryService;
 import org.example.relief.service.IncidentService;
+import org.example.relief.service.LocalNotiService;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -50,6 +51,7 @@ public class IncidentServiceImpl implements IncidentService {
     private final ImageRepository imageRepository;
     private final CloudinaryService cloudinaryService;
     private final FlagRepository flagRepository;
+    private final LocalNotiService notiService;
 
     @Override
     public IncidentResponse reportIncident(IncidentRequest req, List<MultipartFile> images) throws Exception {
@@ -76,21 +78,23 @@ public class IncidentServiceImpl implements IncidentService {
         //sending incident noti to orgs
         //relevant organizations - get their fcm token directly -> create and send noti to it
         userRepository.findUsersByRole("ORGANIZATION")
-                .stream()
-                .map(User::getFcmToken)
-                .filter(t -> t != null && !t.isBlank())
-                .forEach(token -> pushVisibleIncidentToToken(token, incident));
+                .forEach(u -> {
+                    if (u.getFcmToken() != null && !u.getFcmToken().isBlank()) {
+                        pushVisibleIncidentToUser(u, incident);
+                    }
+                });
 
         //sending incident noti to volunteers within 4km after getting the updated location
         //nearby volunteers
-        userRepository.findUsersWithinDistance(incident.getLocation(), 4000D) //distance is in meters
-                .stream()
-                .map(User::getFcmToken)
-                .filter(t -> t != null && !t.isBlank())
-                .forEach(token -> pushVisibleIncidentToToken(token, incident));
+        userRepository.findUsersWithinDistance(incident.getLocation(), 4000D)
+                .forEach(u -> {
+                    if (u.getFcmToken() != null && !u.getFcmToken().isBlank()) {
+                        pushVisibleIncidentToUser(u, incident);
+                    }
+                });
     }
 
-    private void pushVisibleIncidentToToken(String fcmToken, Incident incident) {
+    private void pushVisibleIncidentToUser(User user, Incident incident) {
 
         Notification notif = Notification.builder()
                 .setTitle("🚨 Emergency: " + incident.getTitle())
@@ -98,17 +102,25 @@ public class IncidentServiceImpl implements IncidentService {
                 .build();
 
         Message msg = Message.builder()
-                .setToken(fcmToken)
+                .setToken(user.getFcmToken())
                 .setNotification(notif)
                 .putData("urgency", incident.getUrgencyLevel().name())
                 .putData("description", incident.getDescription())
+                .putData("incidentId", incident.getIncidentId().toString())
                 .build();
 
         try {
             FirebaseMessaging.getInstance().send(msg);
         } catch (FirebaseMessagingException e) {
-            System.err.println("⚠️  FCM send failed for token " + fcmToken + ": " + e.getMessage());
+            System.err.println("⚠️  FCM send failed for token " + user.getFcmToken() + ": " + e.getMessage());
         }
+
+        notiService.save(
+                user,
+                "Emergency: " + incident.getTitle(),
+                incident.getDescription(),
+                "INCIDENT",
+                incident.getIncidentId().toString());
     }
 
     private void sendLocationRequestToTokens(List<String> tokens, Long incidentId) {
@@ -176,7 +188,7 @@ public class IncidentServiceImpl implements IncidentService {
                 request.getIncidentId(), location, 4000);
         //if yes, sending noti to that user
         if (nearby && user.getFcmToken() != null) {
-            pushVisibleIncidentToToken(user.getFcmToken(), incident);
+            pushVisibleIncidentToUser(user, incident);
         }
     }
 
