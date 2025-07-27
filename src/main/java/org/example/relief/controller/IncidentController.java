@@ -50,6 +50,15 @@ public class IncidentController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+    @DeleteMapping("/{incidentId}")
+    public ResponseEntity<?> deleteIncident(@PathVariable Long incidentId) {
+        try {
+            incidentService.deleteIncidentById(incidentId);
+            return ResponseEntity.ok("Incident deleted successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
 
     @PutMapping("/updateLocation")

@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/fcm")
 public class FcmTokenController {
 
     private final UserRepository userRepository;
@@ -16,8 +16,9 @@ public class FcmTokenController {
         this.userRepository = userRepository;
     }
 
-    @PostMapping("/fcm-token")
+    @PostMapping("/sendToken")
     public ResponseEntity<String> updateFcmToken(@RequestBody FcmTokenRequest request) {
+        System.out.println("FcmTokenController: " + request);
         return userRepository.findById(request.getId())
                 .map(user -> {
                     user.setFcmToken(request.getFcmToken());

@@ -23,5 +23,7 @@ public interface IncidentService {
 
     IncidentResponse getIncidentDetails(Long incidentId) throws Exception;
     Page<IncidentResponse> filterIncidents(IncidentFilterRequest request);
+    void deleteIncidentById(Long incidentId) throws Exception;
+
 
 }

@@ -17,10 +17,11 @@ public class DonationController {
 
     private final DonationService donationService;
 
-    @PostMapping
+    @PostMapping("/createDonation")
     public ResponseEntity<DonationResponse> createDonation(@RequestBody DonationRequest request) {
         return ResponseEntity.ok(donationService.createDonation(request));
     }
+
 
     @GetMapping("/open")
     public ResponseEntity<List<DonationResponse>> getOpenDonations() {
@@ -32,4 +33,16 @@ public class DonationController {
         donationService.contributeToDonation(request);
         return ResponseEntity.ok("Donation recorded.");
     }
+
+    @PutMapping("/{donationId}/edit")
+    public ResponseEntity<String> editDonationLimit(@PathVariable Long donationId, @RequestParam double newLimit) {
+        donationService.updateDonationLimit(donationId, newLimit);
+        return ResponseEntity.ok("Donation limit updated.");
+    }
+    @PutMapping("/close/{donationId}")
+    public ResponseEntity<String> closeDonation(@PathVariable Long donationId) {
+        donationService.closeDonation(donationId);
+        return ResponseEntity.ok("Donation campaign closed.");
+    }
+
 }

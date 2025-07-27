@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgis/postgis:15-3.3
+    container_name: relief-postgis
+    restart: always
+    environment:
+      POSTGRES_DB: reliefdb
+      POSTGRES_USER: relief
+      POSTGRES_PASSWORD: reliefpass
+    ports:
+      - "6543:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build: .
+    container_name: relief-backend
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/reliefdb
+      SPRING_DATASOURCE_USERNAME: relief
+      SPRING_DATASOURCE_PASSWORD: reliefpass
+
+      # ⇣⇣ Cloudinary credentials passed to the backend ⇣⇣
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY:    ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET_KEY: ${CLOUDINARY_API_SECRET_KEY}
+
+    ports:
+      - "8080:8080"
+    restart: always
+
+volumes:
+  pgdata:
+

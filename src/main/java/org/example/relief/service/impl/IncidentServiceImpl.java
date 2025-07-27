@@ -330,6 +330,14 @@ public class IncidentServiceImpl implements IncidentService {
                 .donation(donationResponse)
                 .build();
     }
+    @Override
+    public void deleteIncidentById(Long incidentId) throws Exception {
+        Incident incident = incidentRepository.findById(incidentId)
+                .orElseThrow(() -> new IllegalArgumentException("Incident not found"));
+
+        // Automatically deletes related donation, flags, images due to orphanRemoval = true
+        incidentRepository.delete(incident);
+    }
 
 
 

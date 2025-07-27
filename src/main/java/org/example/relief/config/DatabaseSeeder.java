@@ -80,6 +80,7 @@ public class DatabaseSeeder implements CommandLineRunner {
                     .firstName("Admin")
                     .lastName("Istrator")
                     .roles(allRoles)
+                    .canPost(true)
                     .build();
 
             userRepository.save(admin);
@@ -104,6 +105,7 @@ public class DatabaseSeeder implements CommandLineRunner {
                     .address("Kathmandu, Nepal")
                     .firstName("User")
                     .lastName("One")
+                    .canPost(true)
                     .roles(roles)
                     .build();
 
@@ -130,6 +132,7 @@ public class DatabaseSeeder implements CommandLineRunner {
                     .name("Org One")
                     .organizationType(OrganizationType.POLICE)
                     .roles(roles)
+                    .canPost(true)
                     .build();
             userRepository.save(organization);
 

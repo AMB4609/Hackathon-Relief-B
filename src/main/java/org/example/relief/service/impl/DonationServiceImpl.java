@@ -4,14 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.example.relief.model.Donation;
 import org.example.relief.model.Incident;
 import org.example.relief.model.Transaction;
-import org.example.relief.repository.DonationRepository;
-import org.example.relief.repository.IncidentRepository;
-import org.example.relief.repository.TransactionRepository;
-import org.example.relief.repository.UserRepository;
+import org.example.relief.repository.*;
 import org.example.relief.request.DonationContributionRequest;
 import org.example.relief.request.DonationRequest;
 import org.example.relief.response.DonationResponse;
 import org.example.relief.service.DonationService;
+import org.example.relief.service.LocalNotiService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -23,6 +21,7 @@ import java.util.stream.Collectors;
 public class DonationServiceImpl implements DonationService {
 
     private final DonationRepository donationRepository;
+    private final LocalNotiService notificationService;
     private final IncidentRepository incidentRepository;
     private final UserRepository userRepository;
     private final TransactionRepository transactionRepository;
@@ -35,8 +34,18 @@ public class DonationServiceImpl implements DonationService {
         Donation donation = donationRepository.save(Donation.builder()
                 .incident(incident)
                 .collectedAmount(0D)
+                .isOpen(true)
+                .donationCount(0)
                 .donationLimit(request.getDonationLimit())
                 .build());
+
+        userRepository.findUsersByRole("USER").forEach(user -> notificationService.save(
+                user,
+                "🆕 Donation Campaign: " + incident.getTitle(),
+                "Help reach NPR " + request.getDonationLimit() + ". You can contribute from incidents page.",
+                "DONATION_CREATE",
+                donation.getDonationId().toString()
+        ));
 
         return mapToResponse(donation);
     }
@@ -78,6 +87,22 @@ public class DonationServiceImpl implements DonationService {
         }
 
         transactionRepository.save(txBuilder.build());
+        donationRepository.save(donation);
+    }
+    @Override
+    public void updateDonationLimit(Long donationId, double newLimit) {
+        Donation donation = donationRepository.findById(donationId)
+                .orElseThrow(() -> new IllegalArgumentException("Donation not found"));
+
+        donation.setDonationLimit(newLimit);
+        donationRepository.save(donation);
+    }
+    @Override
+    public void closeDonation(Long donationId) {
+        Donation donation = donationRepository.findById(donationId)
+                .orElseThrow(() -> new IllegalArgumentException("Donation not found"));
+
+        donation.setOpen(false);
         donationRepository.save(donation);
     }
 

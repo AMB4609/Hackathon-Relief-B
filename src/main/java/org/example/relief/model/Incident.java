@@ -22,18 +22,25 @@ public class Incident {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long incidentId;
+
     private String title;
+
     @Column(columnDefinition = "geometry(Point, 4326)")
     private Point location;
+
     @Enumerated(EnumType.STRING)
     private UrgencyLevel urgencyLevel;
+
     private String description;
+
     @Enumerated(EnumType.STRING)
     private OrganizationType organizationType;
+
     private LocalDateTime incidentDate;
+
     private LocalDateTime listedDate;
 
-    @OneToMany(mappedBy = "incident")
+    @OneToMany(mappedBy = "incident", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Image> images;
 
     @ManyToOne(optional = true)
@@ -44,5 +51,4 @@ public class Incident {
 
     @OneToMany(mappedBy = "incident", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Flag> flags;
-
 }
